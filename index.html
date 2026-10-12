@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoseAlone — Your Solo Photo Studio</title>
+
+<style>
+:root {
+  --purple: #8064c9;
+  --dark: #443363;
+  --lavender: #f2edff;
+  --white: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #faf8ff;
+  color: #302844;
+}
+
+header {
+  padding: 20px;
+  background: var(--white);
+  border-bottom: 1px solid #eee7ff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  color: var(--purple);
+  font-size: 23px;
+  font-weight: bold;
+}
+
+header span {
+  font-size: 12px;
+  color: #76688c;
+}
+
+main {
+  max-width: 950px;
+  margin: auto;
+  padding: 25px 16px 50px;
+}
+
+.hero {
+  text-align: center;
+  padding: 25px 8px;
+}
+
+.hero h1 {
+  font-size: clamp(30px, 7vw, 45px);
+  margin-bottom: 10px;
+}
+
+.hero h1 span { color: var(--purple); }
+
+.hero p {
+  color: #766d87;
+  line-height: 1.6;
+}
+
+.card {
+  background: white;
+  border: 1px solid #eee7ff;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 18px 0;
+  box-shadow: 0 7px 25px #5a42840a;
+}
+
+h2 { font-size: 19px; }
+
+.preview {
+  width: 100%;
+  max-height: 430px;
+  object-fit: contain;
+  background: #f2eff8;
+  border-radius: 14px;
+  display: block;
+  margin-top: 14px;
+}
+
+.hidden { display: none !important; }
+
+button, select, input {
+  font: inherit;
+}
+
+button {
+  background: var(--purple);
+  color: white;
+  border: 0;
+  padding: 13px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover { background: var(--dark); }
+
+button.secondary {
+  color: var(--dark);
+  background: var(--lavender);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+input[type="file"] {
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+select {
+  padding: 11px;
+  border: 1px solid #ded3f7;
+  border-radius: 10px;
+  background: white;
+  width: 100%;
+  margin-top: 8px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 16px;
+}
+
+.hint {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #786e8b;
+}
+
+.status {
+  padding: 12px;
+  background: var(--lavender);
+  border-radius: 10px;
+  line-height: 1.5;
+  font-size: 14px;
+  margin-top: 14px;
+}
+
+footer {
+  text-align: center;
+  color: #887c9d;
+  font-size: 12px;
+  padding: 25px;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">♡ PoseAlone</div>
+  <span>YOUR SOLO PHOTO STUDIO</span>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Your moment.<br><span>Your perfect pose.</span></h1>
+    <p>Take the photos you imagine, even when you're alone.</p>
+  </section>
+
+  <section class="card">
+    <h2>01 · Your inspiration</h2>
+    <p class="hint">Upload a photo you want to recreate.</p>
+    <input id="referenceInput" type="file" accept="image/*">
+    <img id="referencePreview" class="preview hidden" alt="Reference photo">
+    <p id="referenceStatus" class="hint">Your reference photo will appear here.</p>
+  </section>
+
+  <section class="card">
+    <h2>02 · Set up your shot</h2>
+    <p class="hint">Choose your setup to get practical camera placement tips.</p>
+
+    <label for="angle">Photo angle</label>
+    <select id="angle">
+      <option value="eye">Eye level</option>
+      <option value="high">Camera slightly above you</option>
+      <option value="low">Camera slightly below you</option>
+      <option value="full">Full-body photo</option>
+    </select>
+
+    <label for="distance">Camera distance</label>
+    <select id="distance">
+      <option value="portrait">Close-up portrait</option>
+      <option value="half">Half-body photo</option>
+      <option value="full">Full-body photo</option>
+    </select>
+
+    <button id="guideButton" style="margin-top:16px;width:100%">
+      Get my camera setup guide
+    </button>
+
+    <div id="guide" class="status hidden"></div>
+  </section>
+
+  <section class="card">
+    <h2>03 · Your camera</h2>
+    <p class="hint">Place your phone securely on a tripod or stable surface.</p>
+
+    <video id="camera" class="preview hidden"
+      autoplay playsinline muted></video>
+
+    <div class="actions">
+      <button id="startCamera">Open camera</button>
+      <button id="stopCamera" class="secondary" disabled>Stop camera</button>
+    </div>
+
+    <label for="timer">Self-timer</label>
+    <select id="timer">
+      <option value="3">3 seconds</option>
+      <option value="5" selected>5 seconds</option>
+      <option value="10">10 seconds</option>
+    </select>
+
+    <button id="captureButton" style="margin-top:14px;width:100%" disabled>
+      Take my photo
+    </button>
+
+    <p id="cameraStatus" class="status" role="status">
+      Open your camera when you're ready.
+    </p>
+
+    <canvas id="canvas" class="hidden"></canvas>
+    <img id="capturedPhoto" class="preview hidden" alt="Your captured photo">
+
+    <div class="actions">
+      <a id="downloadLink" class="hidden" download="PoseAlone-photo.jpg">
+        <button type="button">Save my photo</button>
+      </a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>04 · Your pose checklist</h2>
+    <p class="hint">Use these reminders while recreating your reference photo.</p>
+    <label><input type="checkbox"> Check your camera angle</label>
+    <label><input type="checkbox"> Check the background</label>
+    <label><input type="checkbox"> Relax your shoulders</label>
+    <label><input type="checkbox"> Try your pose and expression</label>
+    <label><input type="checkbox"> Take a test shot</label>
+  </section>
+</main>
+
+<footer>Made with ♡ for everyone who loves taking photos.</footer>
+
+<script>
+const referenceInput = document.getElementById("referenceInput");
+const referencePreview = document.getElementById("referencePreview");
+const referenceStatus = document.getElementById("referenceStatus");
+const camera = document.getElementById("camera");
+const startButton = document.getElementById("startCamera");
+const stopButton = document.getElementById("stopCamera");
+const captureButton = document.getElementById("captureButton");
+const cameraStatus = document.getElementById("cameraStatus");
+const canvas = document.getElementById("canvas");
+const capturedPhoto = document.getElementById("capturedPhoto");
+const downloadLink = document.getElementById("downloadLink");
+
+let cameraStream = null;
+let referenceURL = null;
+let photoURL = null;
+let countdownRunning = false;
+
+referenceInput.addEventListener("change", () => {
+  const file = referenceInput.files[0];
+  if (!file) return;
+
+  if (referenceURL) URL.revokeObjectURL(referenceURL);
+  referenceURL = URL.createObjectURL(file);
+  referencePreview.src = referenceURL;
+  referencePreview.classList.remove("hidden");
+  referenceStatus.textContent = "Reference photo loaded!";
+});
+
+document.getElementById("guideButton").addEventListener("click", () => {
+  const angle = document.getElementById("angle").value;
+  const distance = document.getElementById("distance").value;
+
+  const angles = {
+    eye: "Place the camera around eye level. Keep it straight.",
+    high: "Raise the camera slightly above eye level and tilt it gently down.",
+    low: "Place the camera a little below eye level and point it slightly up.",
+    full: "Keep the phone level and leave space above your head and below your feet."
+  };
+
+  const distances = {
+    portrait: "Start around an arm's length away, then adjust your framing.",
+    half: "Move farther away until your upper body fits comfortably.",
+    full: "Move farther back until your entire body fits inside the frame."
+  };
+
+  const guide = document.getElementById("guide");
+  guide.textContent = angles[angle] + " " + distances[distance];
+  guide.classList.remove("hidden");
+});
+
+startButton.addEventListener("click", async () => {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    cameraStatus.textContent =
+      "Camera access is unavailable here. Open this website over HTTPS, such as GitHub Pages, and try again.";
+    return;
+  }
+
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
+
+    camera.srcObject = cameraStream;
+    camera.classList.remove("hidden");
+    await camera.play();
+
+    startButton.disabled = true;
+    stopButton.disabled = false;
+    captureButton.disabled = false;
+    cameraStatus.textContent =
+      "Camera ready! Position your phone securely and get into place.";
+  } catch (error) {
+    cameraStatus.textContent =
+      "Couldn't open the camera. Check your browser permissions and make sure no other app is using it.";
+  }
+});
+
+stopButton.addEventListener("click", stopCamera);
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+
+  camera.srcObject = null;
+  camera.classList.add("hidden");
+  startButton.disabled = false;
+  stopButton.disabled = true;
+  captureButton.disabled = true;
+  cameraStatus.textContent = "Camera stopped.";
+}
+
+captureButton.addEventListener("click", async () => {
+  if (!cameraStream || countdownRunning) return;
+
+  countdownRunning = true;
+  captureButton.disabled = true;
+
+  let remaining = Number(document.getElementById("timer").value);
+
+  while (remaining > 0) {
+    cameraStatus.textContent = "Get ready! Taking photo in " + remaining + "...";
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    remaining--;
+  }
+
+  if (!cameraStream || !camera.videoWidth) {
+    cameraStatus.textContent = "Camera stopped. Open it again to take a photo.";
+    countdownRunning = false;
+    captureButton.disabled = !cameraStream;
+    return;
+  }
+
+  canvas.width = camera.videoWidth;
+  canvas.height = camera.videoHeight;
+
+  const context = canvas.getContext("2d");
+  context.translate(canvas.width, 0);
+  context.scale(-1, 1);
+  context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob(blob => {
+    if (!blob) {
+      cameraStatus.textContent = "Couldn't save this photo. Please try again.";
+      countdownRunning = false;
+      captureButton.disabled = !cameraStream;
+      return;
+    }
+
+    if (photoURL) URL.revokeObjectURL(photoURL);
+    photoURL = URL.createObjectURL(blob);
+
+    capturedPhoto.src = photoURL;
+    capturedPhoto.classList.remove("hidden");
+    downloadLink.href = photoURL;
+    downloadLink.classList.remove("hidden");
+
+    cameraStatus.textContent = "Photo captured! Save it to your device.";
+    countdownRunning = false;
+    captureButton.disabled = !cameraStream;
+  }, "image/jpeg", 0.92);
+});
+
+window.addEventListener("pagehide", stopCamera);
+</script>
+</body>
+</html>
